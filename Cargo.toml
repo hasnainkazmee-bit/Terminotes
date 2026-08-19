@@ -1,14 +1,15 @@
 [package]
-name = "day-1"
+name = "terminotes" 
 version = "0.1.0"
 edition = "2024"
+authors = ["Hasnain Kazmee <hasnain.kazmee@sunhub.com>"]
+description = "A lightweight note-taker for those who live inside terminals."
+readme = "README.md"
+license = "MIT"
+keywords = ["cli", "notes", "sqlite", "learning", "beginner"]
+categories = ["command-line-utilities"]
+exclude = ["notes.txt", "terminotes.db", "plan.md", ".gitignore"]
 
 [dependencies]
-chrono = "0.4"
-reqwest = { version = "0.12", features = ["json"] }
-tokio = { version = "1.0", features = ["full"] }
-
-# For the Web Server / Landing Page
-axum = "0.7"
-serde = { version = "1.0", features = ["derive"] }
-sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+dirs = "5.0"
