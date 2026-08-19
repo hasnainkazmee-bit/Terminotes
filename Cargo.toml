@@ -1,14 +1,18 @@
 [package]
-name = "terminotes" 
+name = "terminotes"
 version = "0.1.0"
-edition = "2024"
-authors = ["Hasnain Kazmee <hasnain.kazmee@sunhub.com>"]
-description = "A lightweight note-taker for those who live inside terminals."
+edition = "2021"
+description = "Terminotes: A note-taker for people spending most of their time inside terminals."
 readme = "README.md"
 license = "MIT"
-keywords = ["cli", "notes", "sqlite", "learning", "beginner"]
+keywords = ["cli", "notes", "sqlite", "terminal", "utility"]
 categories = ["command-line-utilities"]
 exclude = ["notes.txt", "terminotes.db", "plan.md", ".gitignore"]
+
+# THIS IS THE TRICK: Maps the binary name to "tn"
+[[bin]]
+name = "tn"
+path = "src/main.rs"
 
 [dependencies]
 rusqlite = { version = "0.31", features = ["bundled"] }
