@@ -1,40 +1,41 @@
-use std::fs::OpenOptions;
-use std::io::{Write};
+use std::{
+    env,
+    fs::OpenOptions,
+    io::Write,
+};
 
 struct Cli {
     argument: String,
     value: String,
 }
 
+fn main() {
+    let cli = parse_args();
 
-fn main(){
-    // define argument and value
-    let argument = std::env::args().nth(1).expect("Error");
-    let value = std::env::args().nth(2).expect("Error");
+    match cli.argument.as_str() {
+        "notes" => save_note(&cli.value),
+        _ => println!("Unknown argument: {}", cli.argument),
+    }
+}
 
-    // Read the string and convert it into a PathBuf using PathBuf::from
+fn parse_args() -> Cli {
+    let mut args = env::args().skip(1);
 
-    // Create an instance of the cli
-    let arg = Cli {argument, value};
+    let argument = args.next().expect("Missing argument");
+    let value = args.next().expect("Missing value");
 
-    // print value if argument is "notes"
-    if arg.argument == "notes" {
+    Cli { argument, value }
+}
 
-        // Open the file in Append mode, create if missing
-
-        let mut file = OpenOptions::new()
+fn save_note(note: &str) {
+    let mut file = OpenOptions::new()
         .create(true)
         .append(true)
         .open("notes.txt")
-        .expect("No file named 'notes.txt' found!");
+        .expect("Failed to open notes.txt");
 
-        // Format the text with a new line
-        
-        let log_entry = format!("{}\n", arg.value);
+    writeln!(file, "{note}")
+        .expect("Failed to save note");
 
-        // Write the note in notes.txt
-        file.write_all(log_entry.as_bytes()).expect("Failed to save note");
-        println!("Saved!")
-    };
+    println!("Saved!");
 }
-
