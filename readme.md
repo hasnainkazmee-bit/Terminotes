@@ -28,6 +28,12 @@ tn "investigate asynchronous warp frameworks" --idea
 tn list
 ```
 
+### View all defined categories
+```bash
+tn tags
+```
+
+
 ## Local Storage Footprint
 No tracking, no telemetry, and no messy config root spam. Everything lives inside a local SQLite binary (`terminotes.db`) mapped safely to your platform's unified environment data path:
 
