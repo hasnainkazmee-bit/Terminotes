@@ -9,7 +9,6 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    // Isolate a dynamic tag flag if passed anywhere in the arguments (e.g., --idea)
     let mut search_tag: Option<String> = None;
     if let Some(flag_index) = args.iter().position(|a| a.starts_with("--")) {
         let clean_tag = args[flag_index].replacen("--", "", 1).trim().to_string();
@@ -23,7 +22,7 @@ fn main() -> Result<()> {
 
     match first_arg {
         "list" => list_notes(search_tag)?,
-        "tags" => list_tags()?, // New command arm to view all user-defined types
+        "tags" => list_tags()?, 
         _ => {
             let content = args.join(" ").trim().to_string();
 
@@ -47,7 +46,7 @@ fn show_usage() {
     println!("  tn \"your note\" --<any-tag>  -> Append a note with a custom dynamic tag");
     println!("  tn list                     -> Stream all entries to stdout");
     println!("  tn list --<any-tag>         -> Filter results by a specific tag type");
-    println!("  tn tags                     -> List all custom tags you have defined");
+    println!("  tn ltags                     -> List all custom tags you have defined");
 }
 
 fn get_db_connection() -> Result<Connection> {
@@ -76,7 +75,8 @@ fn save_note(note: &str, tag: &str) -> Result<()> {
         [note, tag],
     )?;
 
-    println!("Saved under [{}]!", tag);
+    // Keep this minimal confirmation message standard
+    println!("Saved!");
     Ok(())
 }
 
@@ -102,30 +102,15 @@ fn list_notes(filter_tag: Option<String>) -> Result<()> {
         Ok((row.get::<_, i32>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?))
     })?;
 
-    match &filter_tag {
-        Some(t) => println!("--- Filtered Notes [{}] ---", t),
-        None => println!("--- All Journal Entries ---"),
-    }
-
-    let mut count = 0;
+    // No headers. Just raw, tab-separated stdout values for easy stream parsing.
     for note in note_iter {
         let (id, content, tag) = note?;
-        count += 1;
-        if tag == "general" {
-            println!("{}. {}", id, content);
-        } else {
-            println!("{}. [{}] {}", id, tag, content);
-        }
-    }
-
-    if count == 0 && filter_tag.is_some() {
-        println!("(No notes found with that tag)");
+        println!("{}\t{}\t{}", id, tag, content);
     }
     
     Ok(())
 }
 
-// Scans database for all uniquely generated tags
 fn list_tags() -> Result<()> {
     let conn = get_db_connection()?;
 
@@ -138,19 +123,12 @@ fn list_tags() -> Result<()> {
         [],
     )?;
 
-    // Uses SQL DISTINCT to filter out matching duplicate tag strings
     let mut stmt = conn.prepare("SELECT DISTINCT tag FROM notes WHERE tag != 'general' ORDER BY tag ASC")?;
     let tag_iter = stmt.query_map([], |row| row.get::<_, String>(0))?;
 
-    println!("--- Defined Custom Tags ---");
-    let mut count = 0;
+    // Output raw clean values only
     for tag in tag_iter {
-        println!("  --{}", tag?);
-        count += 1;
-    }
-
-    if count == 0 {
-        println!("  (No custom tags created yet)");
+        println!("{}", tag?);
     }
 
     Ok(())
